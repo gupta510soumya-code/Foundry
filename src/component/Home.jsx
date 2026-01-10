@@ -6,8 +6,7 @@ const Home = () => {
         <div className='homeContainer'>
             {!activeForm&&(
                 <div className='twobuttons'>
-                    <button
-                     className='lost'
+                    <button className='lost'
                      onClick={()=>{
                         setForm('lost')
                      }} >
