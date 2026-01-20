@@ -14,6 +14,7 @@ function App() {
       {/* <Auth/> */}
       <main>
         <Home/>
+        
       </main>
     </div>
     </>
