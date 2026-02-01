@@ -1,23 +1,18 @@
-
 import { useState } from 'react'
 import Home from './component/Home';
 import './App.css'
 import { Navbar } from './component/Navbar';
-// import { Auth } from './component/Auth';
 
 function App() {
+  const [currentView, setCurrentView] = useState('all');
 
   return (
-    <>
-    <div>
-      <Navbar/>
-      {/* <Auth/> */}
-      <main>
-        <Home/>
-        
+    <div className="app-wrapper">
+      <Navbar setView={setCurrentView} />
+      <main className="main-box">
+        <Home view={currentView} />
       </main>
     </div>
-    </>
   )
 }
 

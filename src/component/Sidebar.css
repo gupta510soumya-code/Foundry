@@ -1,0 +1,41 @@
+.sidebar {
+    width: 260px;
+    background-color: #1a1a1a;
+    /* Dark theme for contrast */
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1rem;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar h2 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 0.5rem;
+}
+
+.sidebar button {
+    background: transparent;
+    color: white;
+    border: none;
+    text-align: left;
+    padding: 12px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 1rem;
+}
+
+.sidebar button:hover {
+    background-color: #333;
+    color: #646cff;
+    /* Vite purple color */
+}
+
+.sidebar hr {
+    border: 0.5px solid #333;
+    margin: 1rem 0;
+}
