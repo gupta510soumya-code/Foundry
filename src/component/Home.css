@@ -95,6 +95,18 @@
   line-height: 1.5;
 }
 
+/* ========== Items Section ========== */
+.items-section {
+  margin-top: 3rem;
+}
+
+.items-section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0 0 1rem;
+}
+
 /* ========== Form Container ========== */
 .formContainer {
   background: white;

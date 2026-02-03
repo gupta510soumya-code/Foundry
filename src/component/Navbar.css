@@ -48,6 +48,11 @@
   background: #f1f5f9;
 }
 
+.nav-link.active {
+  color: #6366f1;
+  background: #eef2ff;
+}
+
 .nav-icon {
   font-size: 1rem;
 }

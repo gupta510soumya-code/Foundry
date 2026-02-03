@@ -1,18 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
 import { auth, googleProvider } from "../config/firebase.jsx";
-import { onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
+import { signInWithPopup, signOut } from "firebase/auth";
+import { useSearch } from "../context/SearchContext";
+import { useAuth } from "../context/AuthContext";
 import "./Navbar.css";
 
-export const Navbar = ({ setView }) => {
-  const [user, setUser] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
+export const Navbar = () => {
+  const { searchQuery, setSearchQuery } = useSearch();
+  const { user } = useAuth();
+  const location = useLocation();
 
   const handleGoogleLogin = async () => {
     try {
@@ -31,36 +28,36 @@ export const Navbar = ({ setView }) => {
   };
 
   const navItems = [
-    { id: "all", label: "All Items", icon: "🏠" },
-    { id: "lost", label: "Lost", icon: "🔍" },
-    { id: "found", label: "Found", icon: "🎁" },
+    { path: "/", label: "All Items", icon: "🏠" },
+    { path: "/lost", label: "Lost", icon: "🔍" },
+    { path: "/found", label: "Found", icon: "🎁" },
   ];
 
   return (
     <nav className="navbar">
-      <div className="navbar-brand" onClick={() => setView("all")}>
+      <Link to="/" className="navbar-brand">
         Foundry
-      </div>
+      </Link>
 
       <div className="navbar-links">
         {navItems.map((item) => (
-          <button
-            key={item.id}
-            className="nav-link"
-            onClick={() => setView(item.id)}
+          <Link
+            key={item.path}
+            to={item.path}
+            className={`nav-link ${location.pathname === item.path ? "active" : ""}`}
           >
             <span className="nav-icon">{item.icon}</span>
             <span className="nav-label">{item.label}</span>
-          </button>
+          </Link>
         ))}
         {user && (
-          <button
-            className="nav-link"
-            onClick={() => setView("my-reports")}
+          <Link
+            to="/my-reports"
+            className={`nav-link ${location.pathname === "/my-reports" ? "active" : ""}`}
           >
             <span className="nav-icon">📋</span>
             <span className="nav-label">My Reports</span>
-          </button>
+          </Link>
         )}
       </div>
 

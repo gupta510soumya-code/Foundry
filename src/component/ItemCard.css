@@ -1,0 +1,95 @@
+.item-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.item-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.item-card-image-wrap {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: #f1f5f9;
+}
+
+.item-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+}
+
+.item-card-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.item-card-badge.lost {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.item-card-badge.found {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.item-card-body {
+  padding: 1rem;
+}
+
+.item-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0 0 0.25rem;
+}
+
+.item-card-location {
+  font-size: 0.85rem;
+  color: #6366f1;
+  margin: 0 0 0.5rem;
+}
+
+.item-card-desc {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0 0 0.5rem;
+  line-height: 1.4;
+}
+
+.item-card-time {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.item-card-resolved {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  background: #d1fae5;
+  color: #059669;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 4px;
+}
