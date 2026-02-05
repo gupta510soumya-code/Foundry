@@ -93,3 +93,28 @@
   font-weight: 600;
   border-radius: 4px;
 }
+
+.item-card-claim-btn {
+  display: block;
+  margin-top: 0.75rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: none;
+  background: #eef2ff;
+  color: #4f46e5;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, transform 0.1s;
+}
+
+.item-card-claim-btn:hover:not(:disabled) {
+  background: #e0e7ff;
+  transform: translateY(-1px);
+}
+
+.item-card-claim-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
