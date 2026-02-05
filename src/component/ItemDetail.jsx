@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { db } from "../config/firebase.jsx";
-import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  deleteDoc,
+  collection,
+  addDoc,
+} from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
 import "./ItemDetail.css";
 
@@ -50,6 +57,19 @@ export function ItemDetail() {
         claimedAt: new Date(),
         claimedEmail: user.email,
       }));
+
+      // Notify the original reporter
+      if (item?.userId) {
+        await addDoc(collection(db, "notifications"), {
+          recipientId: item.userId,
+          itemId: id,
+          type: "claim",
+          createdAt: new Date(),
+          read: false,
+          claimerEmail: user.email || null,
+          itemTitle: item.title || "",
+        });
+      }
     } catch (err) {
       console.error(err);
     } finally {
