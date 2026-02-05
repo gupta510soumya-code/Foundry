@@ -32,6 +32,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [claimingId, setClaimingId] = useState(null);
 
   const itemsCollectionRef = collection(db, "campusItems");
   const q = query(itemsCollectionRef, orderBy("time", "desc"));
@@ -130,6 +131,40 @@ const Home = () => {
     setForm(type);
   };
 
+  const handleClaimFromCard = async (item) => {
+    if (!user) {
+      alert("Please sign in to claim an item.");
+      return;
+    }
+    if (item.userId === user.uid || item.resolved || item.claimedBy) return;
+
+    setClaimingId(item.id);
+    try {
+      await updateDoc(doc(db, "campusItems", item.id), {
+        claimedBy: user.uid,
+        claimedAt: new Date(),
+        claimedEmail: user.email,
+      });
+      setItems((prev) =>
+        prev.map((it) =>
+          it.id === item.id
+            ? {
+                ...it,
+                claimedBy: user.uid,
+                claimedAt: new Date(),
+                claimedEmail: user.email,
+              }
+            : it
+        )
+      );
+    } catch (err) {
+      console.error(err);
+      setError("Failed to claim item.");
+    } finally {
+      setClaimingId(null);
+    }
+  };
+
   const emptyMessages = {
     all: "No items yet. Be the first to report something!",
     lost: "No lost items reported yet.",
@@ -178,6 +213,9 @@ const Home = () => {
               loading={loading}
               error={error}
               emptyMessage={emptyMessages[view] || emptyMessages.all}
+              onClaim={handleClaimFromCard}
+              currentUser={user}
+              claimingId={claimingId}
             />
           </section>
         </>

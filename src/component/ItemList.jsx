@@ -2,7 +2,15 @@ import React from "react";
 import { ItemCard } from "./ItemCard";
 import "./ItemList.css";
 
-export function ItemList({ items, loading, error, emptyMessage }) {
+export function ItemList({
+  items,
+  loading,
+  error,
+  emptyMessage,
+  onClaim,
+  currentUser,
+  claimingId,
+}) {
   if (loading) {
     return (
       <div className="item-list-loading">
@@ -30,9 +38,23 @@ export function ItemList({ items, loading, error, emptyMessage }) {
 
   return (
     <div className="item-list">
-      {items.map((item) => (
-        <ItemCard key={item.id} item={item} />
-      ))}
+      {items.map((item) => {
+        const canClaim =
+          !!currentUser &&
+          !item.resolved &&
+          !item.claimedBy &&
+          item.userId !== currentUser.uid;
+
+        return (
+          <ItemCard
+            key={item.id}
+            item={item}
+            canClaim={canClaim}
+            onClaim={onClaim}
+            claiming={claimingId === item.id}
+          />
+        );
+      })}
     </div>
   );
 }
