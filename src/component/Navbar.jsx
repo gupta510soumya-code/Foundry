@@ -45,28 +45,84 @@ export const Navbar = () => {
       return;
     }
 
-    const q = query(
-      collection(db, "notifications"),
-      where("recipientId", "==", user.uid),
-      orderBy("createdAt", "desc")
-    );
+    let unsub;
+    try {
+      const q = query(
+        collection(db, "notifications"),
+        where("recipientId", "==", user.uid),
+        orderBy("createdAt", "desc")
+      );
 
-    const unsub = onSnapshot(q, (snapshot) => {
-      const list = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-      setNotifications(list);
-    });
+      unsub = onSnapshot(
+        q,
+        (snapshot) => {
+          const list = snapshot.docs.map((d) => ({
+            id: d.id,
+            ...d.data(),
+            createdAt: d.data().createdAt,
+          }));
+          setNotifications(list);
+        },
+        (error) => {
+          console.error("Notification error:", error);
+          // If index error, try without orderBy
+          if (error.code === "failed-precondition") {
+            const qSimple = query(
+              collection(db, "notifications"),
+              where("recipientId", "==", user.uid)
+            );
+            unsub = onSnapshot(qSimple, (snapshot) => {
+              const list = snapshot.docs
+                .map((d) => ({
+                  id: d.id,
+                  ...d.data(),
+                  createdAt: d.data().createdAt,
+                }))
+                .sort((a, b) => {
+                  const aTime = a.createdAt?.toDate?.() || new Date(0);
+                  const bTime = b.createdAt?.toDate?.() || new Date(0);
+                  return bTime - aTime;
+                });
+              setNotifications(list);
+            });
+          }
+        }
+      );
+    } catch (err) {
+      console.error("Error setting up notifications:", err);
+    }
 
-    return () => unsub();
+    return () => {
+      if (unsub) unsub();
+    };
   }, [user]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        notifOpen &&
+        !event.target.closest(".navbar-notifications") &&
+        !event.target.closest(".notif-dropdown")
+      ) {
+        setNotifOpen(false);
+        setActiveNotification(null);
+      }
+    };
+
+    if (notifOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [notifOpen]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const handleOpenNotifications = async () => {
-    if (!notifications.length) return;
     setNotifOpen((open) => !open);
     setActiveNotification(null);
 
-    if (!notifOpen) {
+    if (!notifOpen && notifications.length > 0) {
       const unread = notifications.filter((n) => !n.read);
       for (const n of unread) {
         try {
@@ -137,52 +193,82 @@ export const Navbar = () => {
                 </span>
               )}
             </button>
-            {notifOpen && notifications.length > 0 && (
+            {notifOpen && (
               <div className="notif-dropdown">
-                <div className="notif-list">
-                  {notifications.slice(0, 5).map((n) => (
-                    <button
-                      key={n.id}
-                      type="button"
-                      className={`notif-item ${n.read ? "read" : "unread"}`}
-                      onClick={() => setActiveNotification(n)}
-                    >
-                      <span className="notif-text">
-                        Someone claimed \"{n.itemTitle || "your item"}\"
-                      </span>
-                    </button>
-                  ))}
-                  {notifications.length === 0 && (
-                    <div className="notif-empty">No notifications yet.</div>
-                  )}
-                </div>
-                {activeNotification && (
-                  <div className="notif-detail">
-                    <p className="notif-detail-title">
-                      Claim for \"{activeNotification.itemTitle || "your item"}\"
-                    </p>
-                    {activeNotification.claimerEmail && (
-                      <p className="notif-detail-line">
-                        Claimed by: {activeNotification.claimerEmail}
-                      </p>
+                {notifications.length > 0 ? (
+                  <>
+                    <div className="notif-list">
+                      {notifications.slice(0, 10).map((n) => (
+                        <button
+                          key={n.id}
+                          type="button"
+                          className={`notif-item ${n.read ? "read" : "unread"}`}
+                          onClick={() => setActiveNotification(n)}
+                        >
+                          <span className="notif-text">
+                            {n.read ? "✓ " : "● "}
+                            Someone claimed "{n.itemTitle || "your item"}"
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                    {activeNotification && (
+                      <div className="notif-detail">
+                        <p className="notif-detail-title">
+                          Claim for "{activeNotification.itemTitle || "your item"}"
+                        </p>
+                        {activeNotification.claimerEmail && (
+                          <div className="notif-detail-section">
+                            <p className="notif-detail-label">Claimed by:</p>
+                            <p className="notif-detail-value">
+                              {activeNotification.claimerEmail}
+                            </p>
+                            <a
+                              href={`mailto:${activeNotification.claimerEmail}`}
+                              className="notif-contact-btn"
+                            >
+                              📧 Email them
+                            </a>
+                          </div>
+                        )}
+                        {activeNotification.claimerName && (
+                          <div className="notif-detail-section">
+                            <p className="notif-detail-label">Name:</p>
+                            <p className="notif-detail-value">
+                              {activeNotification.claimerName}
+                            </p>
+                          </div>
+                        )}
+                        {activeNotification.createdAt && (
+                          <div className="notif-detail-section">
+                            <p className="notif-detail-label">Claimed at:</p>
+                            <p className="notif-detail-value">
+                              {activeNotification.createdAt?.toDate?.()
+                                ? activeNotification.createdAt
+                                    .toDate()
+                                    .toLocaleString()
+                                : new Date(
+                                    activeNotification.createdAt
+                                  ).toLocaleString()}
+                            </p>
+                          </div>
+                        )}
+                        {activeNotification.itemId && (
+                          <button
+                            type="button"
+                            className="notif-view-item-btn"
+                            onClick={() => {
+                              window.location.href = `/item/${activeNotification.itemId}`;
+                            }}
+                          >
+                            View Item Details →
+                          </button>
+                        )}
+                      </div>
                     )}
-                    {activeNotification.createdAt && (
-                      <p className="notif-detail-line">
-                        At:{" "}
-                        {activeNotification.createdAt?.toDate?.()
-                          ? activeNotification.createdAt
-                              .toDate()
-                              .toLocaleString()
-                          : new Date(
-                              activeNotification.createdAt
-                            ).toLocaleString()}
-                      </p>
-                    )}
-                    <p className="notif-detail-hint">
-                      Open \"My Reports\" and the item detail to manage this
-                      claim.
-                    </p>
-                  </div>
+                  </>
+                ) : (
+                  <div className="notif-empty">No notifications yet.</div>
                 )}
               </div>
             )}
