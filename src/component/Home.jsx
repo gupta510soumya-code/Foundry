@@ -157,6 +157,19 @@ const Home = () => {
             : it
         )
       );
+
+      // Notify the original reporter
+      if (item.userId) {
+        await addDoc(collection(db, "notifications"), {
+          recipientId: item.userId,
+          itemId: item.id,
+          type: "claim",
+          createdAt: new Date(),
+          read: false,
+          claimerEmail: user.email || null,
+          itemTitle: item.title || "",
+        });
+      }
     } catch (err) {
       console.error(err);
       setError("Failed to claim item.");
