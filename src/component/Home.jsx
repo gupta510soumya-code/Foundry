@@ -167,7 +167,10 @@ const Home = () => {
           createdAt: new Date(),
           read: false,
           claimerEmail: user.email || null,
+          claimerName: user.displayName || null,
+          claimerId: user.uid,
           itemTitle: item.title || "",
+          itemStatus: item.status || "",
         });
       }
     } catch (err) {

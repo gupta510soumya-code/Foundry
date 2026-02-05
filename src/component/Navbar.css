@@ -220,25 +220,70 @@
 
 .notif-detail {
   border-top: 1px solid #e2e8f0;
-  padding-top: 0.5rem;
+  padding-top: 0.75rem;
   font-size: 0.85rem;
 }
 
 .notif-detail-title {
   font-weight: 600;
-  margin: 0 0 0.25rem;
+  margin: 0 0 0.75rem;
   color: #1f2933;
+  font-size: 0.9rem;
 }
 
-.notif-detail-line {
-  margin: 0 0 0.2rem;
-  color: #4b5563;
+.notif-detail-section {
+  margin-bottom: 0.75rem;
 }
 
-.notif-detail-hint {
-  margin: 0.25rem 0 0;
+.notif-detail-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0 0 0.25rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.notif-detail-value {
+  margin: 0 0 0.5rem;
+  color: #1f2933;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.notif-contact-btn {
+  display: inline-block;
+  padding: 0.4rem 0.75rem;
+  background: #eef2ff;
+  color: #4f46e5;
+  border-radius: 6px;
+  text-decoration: none;
   font-size: 0.8rem;
-  color: #9ca3af;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.notif-contact-btn:hover {
+  background: #e0e7ff;
+}
+
+.notif-view-item-btn {
+  display: block;
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  background: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.notif-view-item-btn:hover {
+  background: #4f46e5;
 }
 
 @media (max-width: 900px) {
