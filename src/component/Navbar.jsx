@@ -158,13 +158,22 @@ export const Navbar = () => {
           </Link>
         ))}
         {user && (
-          <Link
-            to="/my-reports"
-            className={`nav-link ${location.pathname === "/my-reports" ? "active" : ""}`}
-          >
-            <span className="nav-icon">📋</span>
-            <span className="nav-label">My Reports</span>
-          </Link>
+          <>
+            <Link
+              to="/my-reports"
+              className={`nav-link ${location.pathname === "/my-reports" ? "active" : ""}`}
+            >
+              <span className="nav-icon">📋</span>
+              <span className="nav-label">My Reports</span>
+            </Link>
+            <Link
+              to="/history"
+              className={`nav-link ${location.pathname === "/history" ? "active" : ""}`}
+            >
+              <span className="nav-icon">📜</span>
+              <span className="nav-label">History</span>
+            </Link>
+          </>
         )}
       </div>
 
