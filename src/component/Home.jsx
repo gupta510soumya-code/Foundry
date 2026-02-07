@@ -62,12 +62,26 @@ const Home = () => {
   const filteredItems = useMemo(() => {
     let list = items;
 
-    if (view === "lost") list = list.filter((i) => i.status === "LOST");
-    else if (view === "found") list = list.filter((i) => i.status === "FOUND");
-    else if (view === "my-reports" && user)
+    // Filter by view type
+    if (view === "lost") {
+      list = list.filter((i) => i.status === "LOST");
+    } else if (view === "found") {
+      list = list.filter((i) => i.status === "FOUND");
+    } else if (view === "my-reports" && user) {
       list = list.filter((i) => i.userId === user.uid);
-    else if (view === "my-reports" && !user) list = [];
+    } else if (view === "my-reports" && !user) {
+      list = [];
+    } else if (view === "history") {
+      // History shows only reunited/resolved items
+      list = list.filter((i) => i.resolved === true);
+    }
 
+    // Remove resolved items from main views (all, lost, found)
+    if (view !== "history" && view !== "my-reports") {
+      list = list.filter((i) => !i.resolved);
+    }
+
+    // Apply search filter
     const q = searchQuery.trim().toLowerCase();
     if (q) {
       list = list.filter(
@@ -186,6 +200,7 @@ const Home = () => {
     lost: "No lost items reported yet.",
     found: "No found items reported yet.",
     "my-reports": "You haven't reported any items yet.",
+    history: "No reunited items yet.",
   };
 
   return (
@@ -223,6 +238,7 @@ const Home = () => {
               {view === "lost" && "Lost items"}
               {view === "found" && "Found items"}
               {view === "my-reports" && "My reports"}
+              {view === "history" && "Reunited items"}
             </h2>
             <ItemList
               items={filteredItems}

@@ -16,6 +16,7 @@ function App() {
             <Route path="lost" element={<Home />} />
             <Route path="found" element={<Home />} />
             <Route path="my-reports" element={<Home />} />
+            <Route path="history" element={<Home />} />
             <Route path="item/:id" element={<ItemDetail />} />
           </Route>
         </Routes>
