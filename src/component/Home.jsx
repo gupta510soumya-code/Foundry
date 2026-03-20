@@ -19,7 +19,7 @@ import "./Home.css";
 const Home = () => {
   const location = useLocation();
   const { searchQuery } = useSearch();
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
 
   const view = location.pathname === "/" ? "all" : location.pathname.slice(1);
 
@@ -35,13 +35,15 @@ const Home = () => {
   const [claimingId, setClaimingId] = useState(null);
 
   const itemsCollectionRef = collection(db, "campusItems");
-  const q = query(itemsCollectionRef, orderBy("time", "desc"));
 
   useEffect(() => {
+    if (authLoading) return;
+
     async function fetchItems() {
       setLoading(true);
       setError(null);
       try {
+        const q = query(itemsCollectionRef, orderBy("time", "desc"));
         const snapshot = await getDocs(q);
         const list = snapshot.docs.map((d) => ({
           id: d.id,
@@ -51,13 +53,28 @@ const Home = () => {
         setItems(list);
       } catch (err) {
         console.error(err);
-        setError("Failed to load items.");
+        // Fallback: try without ordering if `orderBy("time")` fails
+        try {
+          const snapshot = await getDocs(itemsCollectionRef);
+          const list = snapshot.docs.map((d) => ({
+            id: d.id,
+            ...d.data(),
+            time: d.data().time,
+          }));
+          setItems(list);
+          setError(null);
+        } catch (err2) {
+          console.error(err2);
+          setError(
+            `Failed to load items: ${err2?.message || err?.message || "Unknown error"}`
+          );
+        }
       } finally {
         setLoading(false);
       }
     }
     fetchItems();
-  }, []);
+  }, [authLoading, user]);
 
   const filteredItems = useMemo(() => {
     let list = items;
@@ -174,22 +191,27 @@ const Home = () => {
 
       // Notify the original reporter
       if (item.userId) {
-        await addDoc(collection(db, "notifications"), {
-          recipientId: item.userId,
-          itemId: item.id,
-          type: "claim",
-          createdAt: new Date(),
-          read: false,
-          claimerEmail: user.email || null,
-          claimerName: user.displayName || null,
-          claimerId: user.uid,
-          itemTitle: item.title || "",
-          itemStatus: item.status || "",
-        });
+        try {
+          await addDoc(collection(db, "notifications"), {
+            recipientId: item.userId,
+            itemId: item.id,
+            type: "claim",
+            createdAt: new Date(),
+            read: false,
+            claimerEmail: user.email || null,
+            claimerName: user.displayName || null,
+            claimerId: user.uid,
+            itemTitle: item.title || "",
+            itemStatus: item.status || "",
+          });
+        } catch (notifErr) {
+          // Claim should still succeed even if notifications are blocked by rules.
+          console.error("Notification write failed:", notifErr);
+        }
       }
     } catch (err) {
       console.error(err);
-      setError("Failed to claim item.");
+      setError(`Failed to claim item: ${err?.message || "Unknown error"}`);
     } finally {
       setClaimingId(null);
     }

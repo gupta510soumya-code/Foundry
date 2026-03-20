@@ -60,18 +60,23 @@ export function ItemDetail() {
 
       // Notify the original reporter
       if (item?.userId) {
-        await addDoc(collection(db, "notifications"), {
-          recipientId: item.userId,
-          itemId: id,
-          type: "claim",
-          createdAt: new Date(),
-          read: false,
-          claimerEmail: user.email || null,
-          claimerName: user.displayName || null,
-          claimerId: user.uid,
-          itemTitle: item.title || "",
-          itemStatus: item.status || "",
-        });
+        try {
+          await addDoc(collection(db, "notifications"), {
+            recipientId: item.userId,
+            itemId: id,
+            type: "claim",
+            createdAt: new Date(),
+            read: false,
+            claimerEmail: user.email || null,
+            claimerName: user.displayName || null,
+            claimerId: user.uid,
+            itemTitle: item.title || "",
+            itemStatus: item.status || "",
+          });
+        } catch (notifErr) {
+          // Claim should still succeed even if notifications are blocked by rules.
+          console.error("Notification write failed:", notifErr);
+        }
       }
     } catch (err) {
       console.error(err);
